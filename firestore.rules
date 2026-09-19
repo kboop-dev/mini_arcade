@@ -1,0 +1,48 @@
+rules_version = '2';
+
+// ============================================================================
+// Reglas de seguridad de Firestore.
+// La "API key" de Firebase para apps web NO es secreta; lo que realmente
+// protege tus datos son ESTAS reglas. Súbelas con: firebase deploy --only firestore:rules
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cada usuario solo puede leer y escribir su propio documento de perfil/progreso
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Progreso de rompecabezas guardado por el propio usuario (subcolección)
+      match /puzzle_progress/{puzzleId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Nota: los tickets (ticketsUnlocked) son un campo tipo Mapa dentro del
+      // mismo documento del usuario, por lo que ya quedan protegidos arriba.
+    }
+
+    // Catálogo de preguntas de trivia: lectura pública autenticada
+    match /trivia_questions/{questionId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Catálogo de tickets disponibles: solo lectura
+    match /tickets_catalog/{ticketId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Galería de fotos oficiales de rompecabezas: solo lectura
+    match /puzzle_gallery/{photoId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Todo lo demás: denegado por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
