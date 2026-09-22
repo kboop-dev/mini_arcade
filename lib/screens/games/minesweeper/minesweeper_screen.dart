@@ -9,6 +9,7 @@ import '../../../widgets/fit_appbar_title.dart';
 
 enum Difficulty { facil, medio, dificil }
 
+//cantidad de bombas
 extension on Difficulty {
   int get size => switch (this) {
         Difficulty.facil => 8,
@@ -57,7 +58,8 @@ class _MinesweeperScreenState extends State<MinesweeperScreen> {
         gameKey: 'minesweeper',
         lines: [
           'Este es nuestro buscaminas de corazones y besos 💣💋. Elige un nivel: fácil, medio o difícil.',
-          'Toca 🪏 para destapar casillas, o cambia a 🚩 para poner una bandera donde creas que hay una bomba, sin destaparla.',
+          'Toca ✋ para destapar casillas, o cambia a 🚩 para poner una bandera donde creas que hay una bomba, sin destaparla.',
+          'El número que te aparezca en la esquina superior izquierda es el número de bombas 💣 que hay, mucho cuidado.',
           'Si ganas en dificultad DIFÍCIL, te llevas +600 XP y un ticket sorpresa 🎟️ (en fácil y medio no hay ticket, ¡ese es solo para los valientes!).',
         ],
       );
@@ -76,19 +78,25 @@ class _MinesweeperScreenState extends State<MinesweeperScreen> {
         placed++;
       }
     }
-    _neighborCount = List.generate(n, (r) => List.generate(n, (c) {
-          if (_bombGrid[r][c]) return -1;
-          int count = 0;
-          for (var dr = -1; dr <= 1; dr++) {
-            for (var dc = -1; dc <= 1; dc++) {
-              final nr = r + dr, nc = c + dc;
-              if (nr >= 0 && nr < n && nc >= 0 && nc < n && _bombGrid[nr][nc]) {
-                count++;
+    _neighborCount = List.generate(
+        n,
+        (r) => List.generate(n, (c) {
+              if (_bombGrid[r][c]) return -1;
+              int count = 0;
+              for (var dr = -1; dr <= 1; dr++) {
+                for (var dc = -1; dc <= 1; dc++) {
+                  final nr = r + dr, nc = c + dc;
+                  if (nr >= 0 &&
+                      nr < n &&
+                      nc >= 0 &&
+                      nc < n &&
+                      _bombGrid[nr][nc]) {
+                    count++;
+                  }
+                }
               }
-            }
-          }
-          return count;
-        }));
+              return count;
+            }));
     _revealed = List.generate(n, (_) => List.filled(n, false));
     _flagged = List.generate(n, (_) => List.filled(n, false));
     setState(() {
@@ -226,9 +234,11 @@ class _MinesweeperScreenState extends State<MinesweeperScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.dangerous, color: AppColors.heartRed, size: 18),
+                    const Icon(Icons.dangerous,
+                        color: AppColors.heartRed, size: 18),
                     const SizedBox(width: 4),
-                    Text('$_bombsLeftCounter', style: const TextStyle(fontSize: 16)),
+                    Text('$_bombsLeftCounter',
+                        style: const TextStyle(fontSize: 16)),
                   ],
                 ),
                 _TapModeToggle(
@@ -245,7 +255,8 @@ class _MinesweeperScreenState extends State<MinesweeperScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: n),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: n),
                   itemCount: n * n,
                   itemBuilder: (context, index) {
                     final r = index ~/ n, c = index % n;
@@ -292,7 +303,8 @@ class _MinesweeperScreenState extends State<MinesweeperScreen> {
         child = const Icon(Icons.dangerous, color: Colors.black, size: 16);
       } else if (count > 0) {
         child = Text('$count',
-            style: TextStyle(color: _numberColor(count), fontWeight: FontWeight.bold));
+            style: TextStyle(
+                color: _numberColor(count), fontWeight: FontWeight.bold));
       } else {
         child = const Icon(Icons.favorite, color: AppColors.pink, size: 12);
       }
@@ -369,7 +381,8 @@ class _ToggleButton extends StatelessWidget {
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
-  const _ToggleButton({required this.icon, required this.selected, required this.onTap});
+  const _ToggleButton(
+      {required this.icon, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -378,7 +391,8 @@ class _ToggleButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         color: selected ? AppColors.cyan : Colors.transparent,
-        child: Icon(icon, size: 20, color: selected ? AppColors.bgDark : AppColors.cyan),
+        child: Icon(icon,
+            size: 20, color: selected ? AppColors.bgDark : AppColors.cyan),
       ),
     );
   }

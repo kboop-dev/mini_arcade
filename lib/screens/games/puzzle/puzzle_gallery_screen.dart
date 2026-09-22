@@ -7,10 +7,18 @@ import 'puzzle_game_screen.dart';
 
 enum PuzzleMode { cronometro, creativo }
 
-final List<String> officialPuzzlePhotos = List.generate(
-  10,
-  (i) => 'assets/images/puzzles/foto${i + 1}.jpg',
-);
+final List<String> officialPuzzlePhotos = [
+  'assets/images/puzzles/foto1.jpeg',
+  'assets/images/puzzles/foto2.jpeg',
+  'assets/images/puzzles/foto3.jpeg',
+  'assets/images/puzzles/foto4.jpeg',
+  'assets/images/puzzles/foto5.jpeg',
+  'assets/images/puzzles/foto6.jpeg',
+  'assets/images/puzzles/foto7.jpeg',
+  'assets/images/puzzles/foto8.jpeg',
+  'assets/images/puzzles/foto9.jpeg',
+  'assets/images/puzzles/foto10.jpeg',
+];
 
 class PuzzleGalleryScreen extends StatelessWidget {
   const PuzzleGalleryScreen({super.key});

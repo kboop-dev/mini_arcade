@@ -9,7 +9,7 @@ class MusicService extends ChangeNotifier {
 
   bool get isMuted => _muted;
 
-  static const String trackFile = 'bg_music.mp3';
+  static const String trackFile = 'audio/bg_music.mp3';
   static const double _defaultVolume = 0.45;
 
   /// Intenta arrancar la música. Los navegadores (Chrome, Safari) bloquean
@@ -29,13 +29,21 @@ class MusicService extends ChangeNotifier {
   }
 
   /// Llamar en el primer toque/tap que el jugador haga en la app
+  // En music_service.dart
   Future<void> resumeIfBlocked() async {
+    if (_muted) return;
+
     if (!_started) {
       await start();
       return;
     }
-    if (!_muted && _player.state != PlayerState.playing) {
-      await _player.resume();
+
+    if (_player.state != PlayerState.playing) {
+      try {
+        await _player.resume();
+      } catch (_) {
+        await start();
+      }
     }
   }
 

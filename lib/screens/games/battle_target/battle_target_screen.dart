@@ -534,20 +534,42 @@ class _BattleTargetScreenState extends State<BattleTargetScreen> {
                     style: const TextStyle(fontSize: 12, color: Colors.white70),
                   ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () => setState(() => _difficulty = null),
-                      child: const Text('CAMBIAR NIVEL'),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('VOLVER AL ARCADE'),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     OutlinedButton(
+                //       onPressed: () => setState(() => _difficulty = null),
+                //       child: const Text('CAMBIAR NIVEL'),
+                //     ),
+                //     const SizedBox(width: 12),
+                //     ElevatedButton(
+                //       onPressed: () => Navigator.pop(context),
+                //       child: const Text('VOLVER AL ARCADE'),
+                //     ),
+                //   ],
+                // ),
+
+                //adaptativo a celular
+                SizedBox(
+                  width: double
+                      .infinity, // Hace que los botones abarquen un ancho uniforme
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => setState(() => _difficulty = null),
+                        child: const Text('CAMBIAR NIVEL'),
+                      ),
+                      const SizedBox(
+                          height: 10), // Espacio vertical entre botones
+                      OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('VOLVER AL ARCADE'),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),

@@ -11,7 +11,7 @@ class AppUser {
   // IDs de rompecabezas oficiales completados en modo supervivencia (1-10)
   final List<String> puzzlesCompletedSurvival;
 
-  // IDs de tickets ya desbloqueados y canjeados
+  // IDs de tickets ya desbloqueados y si ya fueron canjeados
   final Map<String, bool> ticketsUnlocked; // ticketId -> canjeado?
 
   AppUser({
@@ -32,9 +32,8 @@ class AppUser {
       email: map['email'] ?? '',
       xp: (map['xp'] ?? 0) as int,
       createdAt: DateTime.tryParse(map['createdAt'] ?? '') ?? DateTime.now(),
-      avatar: AvatarConfig.fromMap(map['avatar'] != null
-          ? Map<String, dynamic>.from(map['avatar'])
-          : null),
+      avatar: AvatarConfig.fromMap(
+          map['avatar'] != null ? Map<String, dynamic>.from(map['avatar']) : null),
       puzzlesCompletedSurvival:
           List<String>.from(map['puzzlesCompletedSurvival'] ?? []),
       ticketsUnlocked: Map<String, bool>.from(map['ticketsUnlocked'] ?? {}),
@@ -57,9 +56,9 @@ class AppUser {
 /// Rango de jugador según XP acumulado.
 enum PlayerRank {
   recluta('Novio Recluta', 0),
-  elite('Novio Élite', 1500),
-  maestro('Novio Maestro', 3500),
-  mitico('Novio Mítico / Leyenda', 6000);
+  elite('Novio Élite', 4000),
+  maestro('Novio Maestro', 10000),
+  mitico('Novio Mítico / Leyenda', 20000);
 
   final String label;
   final int minXp;

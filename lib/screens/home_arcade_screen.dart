@@ -10,6 +10,7 @@ import 'games/safe/safe_screen.dart';
 import 'games/minesweeper/minesweeper_screen.dart';
 import 'games/hangman/hangman_screen.dart';
 import 'games/battle_target/battle_target_screen.dart';
+import 'games/solitaire/solitaire_screen.dart';
 import 'tickets/tickets_gallery_screen.dart';
 import 'profile/profile_screen.dart';
 import '../widgets/avatar_view.dart';
@@ -42,6 +43,8 @@ class HomeArcadeScreen extends StatelessWidget {
           (_) => const MinesweeperScreen()),
       GameEntry('Zona de\nCombate', Icons.gps_fixed, AppColors.pink,
           (_) => const BattleTargetScreen()),
+      GameEntry('Solitario', Icons.style, AppColors.cyan,
+          (_) => const SolitaireScreen()),
     ];
 
     return ArcadeBackground(
@@ -117,6 +120,12 @@ class _Header extends StatelessWidget {
     final progress =
         next == null ? 1.0 : (xp - rank.minXp) / (next.minXp - rank.minXp);
 
+    // En celular, el avatar se ve más grande y el saludo más chico, para
+    // que se sienta más como el perfil de un juego real y no un formulario.
+    final isMobile = Responsive.isMobile(context);
+    final avatarSize = isMobile ? 72.0 : 56.0;
+    final greetingSize = isMobile ? 15.0 : 22.0;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: InkWell(
@@ -135,14 +144,19 @@ class _Header extends StatelessWidget {
               if (user != null)
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
-                  child: AvatarView(config: user!.avatar, size: 56),
+                  child: AvatarView(config: user!.avatar, size: avatarSize),
                 ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('¡Hola, ${user?.username ?? '...'}!',
-                        style: Theme.of(context).textTheme.headlineMedium),
+                    Text(
+                      '¡Hola, ${user?.username ?? '...'}!',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(fontSize: greetingSize),
+                    ),
                     const SizedBox(height: 8),
                     Text(rank.label,
                         style: const TextStyle(

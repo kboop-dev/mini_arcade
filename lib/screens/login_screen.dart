@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return 'No existe una cuenta con ese correo.';
       case 'wrong-password':
       case 'invalid-credential':
-        return 'Contraseña incorrecta.';
+        return 'Coreo o contraseña incorrecta.';
       case 'invalid-email':
         return 'Correo inválido.';
       default:

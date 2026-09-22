@@ -68,6 +68,7 @@ class _KeylaIanArcadeAppState extends State<KeylaIanArcadeApp> {
     super.dispose();
   }
 
+  // En main.dart dentro de _KeylaIanArcadeAppState
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -78,20 +79,16 @@ class _KeylaIanArcadeAppState extends State<KeylaIanArcadeApp> {
         ChangeNotifierProvider<MusicService>.value(value: _music),
       ],
       child: MaterialApp(
-        title: 'Arcade Keyla & Ian',
+        title: 'MiniArcade',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.theme,
         scrollBehavior: NoScrollbarBehavior(),
         home: const AuthGate(),
-        // El builder envuelve CUALQUIER pantalla (login, registro, home,
-        // cada minijuego) con un detector de toque invisible que reintenta
-        // reproducir la música si el navegador bloqueó el autoplay — sin
-        // mostrar ningún botón ni ícono encima de las pantallas.
         builder: (context, child) {
-          return GestureDetector(
+          return Listener(
             behavior: HitTestBehavior.translucent,
-            onTap: () => _music.resumeIfBlocked(),
-            child: child,
+            onPointerDown: (_) => _music.resumeIfBlocked(),
+            child: child ?? const SizedBox.shrink(),
           );
         },
       ),

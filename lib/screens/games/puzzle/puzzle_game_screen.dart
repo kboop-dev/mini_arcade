@@ -290,30 +290,41 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
 
   Widget _buildResult() {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(_lost ? Icons.timer_off : Icons.emoji_events,
-              size: 64, color: _lost ? AppColors.heartRed : AppColors.gold),
-          const SizedBox(height: 16),
-          Text(_lost ? '¡Se acabó el tiempo!' : '¡Rompecabezas completado! 🧩',
-              style: Theme.of(context).textTheme.headlineMedium),
-          if (!_lost &&
-              widget.mode == PuzzleMode.cronometro &&
-              !_isHardestConfig) ...[
-            const SizedBox(height: 8),
-            const Text(
-              'Tip: el ticket sorpresa se gana con 100 piezas en modo cronómetro 🎟️',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.white70),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              _lost ? Icons.timer_off : Icons.emoji_events,
+              size: 64,
+              color: _lost ? AppColors.heartRed : AppColors.gold,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _lost ? '¡Se acabó el tiempo!' : '¡Esoooo, lo lograste! 🧩',
+              textAlign:
+                  TextAlign.center, // Centra el título en pantallas angostas
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            if (!_lost &&
+                widget.mode == PuzzleMode.cronometro &&
+                !_isHardestConfig) ...[
+              const SizedBox(height: 12),
+              const Text(
+                'Tip: el ticket sorpresa se gana con 100 piezas en modo cronómetro 🎟️',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.white70),
+              ),
+            ],
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('VOLVER'),
             ),
           ],
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('VOLVER'),
-          ),
-        ],
+        ),
       ),
     );
   }

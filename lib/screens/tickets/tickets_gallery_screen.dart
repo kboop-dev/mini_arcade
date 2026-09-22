@@ -75,9 +75,7 @@ class _TicketCard extends StatelessWidget {
           found ? () => _openDetail(context) : () => _showLockedHint(context),
       child: Container(
         decoration: BoxDecoration(
-          // Bolsa de regalo gris/apagada si todavía no lo tienes; a color
-          // (con su imagen real) en cuanto lo desbloqueas.
-          color: !found ? Colors.grey.shade900 : AppColors.bgDark2,
+          color: AppColors.bgDark2,
           border: Border.all(
             color: !found
                 ? Colors.white24
@@ -90,30 +88,27 @@ class _TicketCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (found)
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Opacity(
-                    opacity: redeemed ? 0.5 : 1,
-                    child: Image.asset(
-                      def.imageAsset,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.card_giftcard,
-                        size: 40,
-                        color: redeemed ? Colors.white38 : AppColors.gold,
-                      ),
-                    ),
+            Expanded(
+              // Siempre muestra el REGALO (no el ticket en sí): en blanco y
+              // negro si todavía no lo tienes, a color en cuanto lo
+              // desbloqueas. Así no se revela qué es hasta que lo abres.
+              child: Opacity(
+                opacity: redeemed ? 0.6 : 1,
+                child: Image.asset(
+                  found
+                      ? 'assets/images/tickets/gift_unlocked.png'
+                      : 'assets/images/tickets/gift_locked.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.card_giftcard,
+                    size: 40,
+                    color: !found
+                        ? Colors.grey
+                        : (redeemed ? Colors.white38 : AppColors.gold),
                   ),
                 ),
-              )
-            else
-              const Expanded(
-                // Bolsa de regalo gris (no candado): sigue siendo un ticket
-                // pendiente por encontrar, no algo prohibido.
-                child: Icon(Icons.card_giftcard, size: 40, color: Colors.grey),
               ),
+            ),
             const SizedBox(height: 6),
             Text(
               !found
@@ -171,7 +166,8 @@ class _TicketDetailDialogState extends State<_TicketDetailDialog> {
     _confetti =
         ConfettiController(duration: const Duration(milliseconds: 1200));
     // Cada vez que abres un ticket que todavía no has canjeado, sorpresa con
-    // confeti
+    // confeti, para que se sienta como un "rasca y gana", no algo que ya
+    // viste mil veces.
     if (!widget.redeemed) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _confetti.play());
     }
@@ -263,7 +259,8 @@ class _TicketDetailDialogState extends State<_TicketDetailDialog> {
                     )
                   else
                     Column(
-                      // Canjear abajo, ancho completo
+                      // Canjear abajo, ancho completo; Cancelar arriba de él,
+                      // como texto simple — así no compiten uno con otro.
                       children: [
                         SizedBox(
                           width: double.infinity,

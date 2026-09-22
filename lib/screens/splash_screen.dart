@@ -15,7 +15,7 @@ class SplashScreen extends StatelessWidget {
             const Icon(Icons.videogame_asset, size: 64, color: AppColors.gold),
             const SizedBox(height: 16),
             Text(
-              'ARCADE\nKEYLA & IAN',
+              'MINI\nARCADE',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineMedium,
             ),

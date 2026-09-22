@@ -72,10 +72,15 @@ class _SafeScreenState extends State<SafeScreen> {
   Widget _buildLock() {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment:
+          CrossAxisAlignment.center, // Centra los elementos horizontalmente
       children: [
         const Icon(Icons.lock, size: 72, color: AppColors.gold),
         const SizedBox(height: 16),
-        const Text('Ingresa la fecha especial (DD / MM / AAAA)'),
+        const Text(
+          'Ingresa la fecha especial (DD / MM / AAAA)',
+          textAlign: TextAlign.center, // Centra el texto en celulares
+        ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +94,12 @@ class _SafeScreenState extends State<SafeScreen> {
         ),
         if (_error != null) ...[
           const SizedBox(height: 12),
-          Text(_error!, style: const TextStyle(color: AppColors.heartRed)),
+          Text(
+            _error!,
+            textAlign: TextAlign
+                .center, // Centra el mensaje de error si ocupa varias líneas
+            style: const TextStyle(color: AppColors.heartRed),
+          ),
         ],
         const SizedBox(height: 20),
         ElevatedButton(onPressed: _tryOpen, child: const Text('ABRIR')),

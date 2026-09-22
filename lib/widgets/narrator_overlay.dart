@@ -3,27 +3,6 @@ import 'package:provider/provider.dart';
 import '../services/narrator_service.dart';
 import '../theme/app_theme.dart';
 
-/// Llama esto en el initState (o justo después del primer build) de
-/// cualquier pantalla de juego para que, SOLO la primera vez, Keyla
-/// aparezca narrando cómo se juega y cómo se consiguen los tickets.
-///
-/// Ejemplo de uso dentro de un State:
-/// ```dart
-/// @override
-/// void initState() {
-///   super.initState();
-///   WidgetsBinding.instance.addPostFrameCallback((_) {
-///     showNarratorIfNeeded(
-///       context,
-///       gameKey: 'trivia',
-///       lines: [
-///         'Aquí te voy a hacer 10 preguntas al azar sobre nosotros. ¡Tienes 3 corazones!',
-///         'Si fallas 3 veces, pierdes. Pero si las aciertas TODAS, te llevas +500 XP y un ticket sorpresa 🎟️',
-///       ],
-///     );
-///   });
-/// }
-/// ```
 Future<void> showNarratorIfNeeded(
   BuildContext context, {
   required String gameKey,
@@ -86,7 +65,9 @@ class _NarratorDialogState extends State<NarratorDialog> {
             const SizedBox(height: 4),
             const Text('KEYLA',
                 style: TextStyle(
-                    color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.bold)),
+                    color: AppColors.cyan,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             // Globo de diálogo
             Container(
@@ -102,7 +83,8 @@ class _NarratorDialogState extends State<NarratorDialog> {
                 children: [
                   Text(
                     widget.lines[_index],
-                    style: const TextStyle(fontSize: 13, height: 1.5, color: AppColors.textLight),
+                    style: const TextStyle(
+                        fontSize: 13, height: 1.5, color: AppColors.textLight),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -110,7 +92,8 @@ class _NarratorDialogState extends State<NarratorDialog> {
                     children: [
                       Text(
                         '${_index + 1}/${widget.lines.length}',
-                        style: const TextStyle(fontSize: 10, color: Colors.white54),
+                        style: const TextStyle(
+                            fontSize: 10, color: Colors.white54),
                       ),
                       ElevatedButton(
                         onPressed: () {
