@@ -8,8 +8,15 @@ import '../../../widgets/fit_appbar_title.dart';
 
 const String kAnniversaryDate = '22/09/2023';
 
-const String kAnniversaryLetter =
-    'Aquí va la carta de su aniversario. Reemplaza este texto por el mensaje real 💌';
+const String kAnniversaryLetter = '''
+    Holis miamoor, ¡Feliz aniversarioo!💗
+
+    Este pequeño regalo fue hecho con todo mi amor esperando darte algo diferente y especial, espero que te guste mucho, tanto como tú a mí.
+
+    Gracias por aguantarme estos 3 años jaja de verdad que lo has dado todo, por ser el mejor novio, por las risas, por los momentos felices y por construir tantas cosas lindas conmigo. Me encanta la pareja que formamos y jamás cambiaría por nada del mundo todo lo que hemos vivido juntos porque ha sido mejor que estar en un sueño o en cualquier película romántica.
+
+    Te amo con todo mi corazón ¡y vamos por muchos años más!🙈
+    ''';
 
 class SafeScreen extends StatefulWidget {
   const SafeScreen({super.key});
