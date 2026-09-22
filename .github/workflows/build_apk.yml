@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK (Debug signed)
+      - name: Build APK Debug
         run: flutter build apk --debug
 
       - name: Extract SHA1 from APK

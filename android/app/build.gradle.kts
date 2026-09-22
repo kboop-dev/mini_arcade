@@ -27,8 +27,8 @@ android {
 
     buildTypes {
         release {
-            // Asigna la firma debug para que el APK release salga firmado siempre
-            signingConfig signingConfigs.debug
+            // Deja este bloque limpio como estaba originalmente
+            signingConfig = signingConfigs.getByName("debug") // O simplemente vacio
         }
     }
 }
