@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:confetti/confetti.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
 import '../../models/user_model.dart';
 import '../../models/ticket_catalog.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/fit_appbar_title.dart';
 
 class TicketsGalleryScreen extends StatelessWidget {
   const TicketsGalleryScreen({super.key});
@@ -16,7 +18,7 @@ class TicketsGalleryScreen extends StatelessWidget {
     final uid = auth.currentUser!.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Galería de tickets 🎟️')),
+      appBar: AppBar(title: FitAppBarTitle('Galería de tickets 🎟️')),
       body: StreamBuilder<AppUser>(
         stream: db.watchUser(uid),
         builder: (context, snapshot) {
@@ -73,7 +75,9 @@ class _TicketCard extends StatelessWidget {
           found ? () => _openDetail(context) : () => _showLockedHint(context),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.bgDark2,
+          // Bolsa de regalo gris/apagada si todavía no lo tienes; a color
+          // (con su imagen real) en cuanto lo desbloqueas.
+          color: !found ? Colors.grey.shade900 : AppColors.bgDark2,
           border: Border.all(
             color: !found
                 ? Colors.white24
@@ -106,7 +110,9 @@ class _TicketCard extends StatelessWidget {
               )
             else
               const Expanded(
-                child: Icon(Icons.lock, size: 36, color: Colors.white24),
+                // Bolsa de regalo gris (no candado): sigue siendo un ticket
+                // pendiente por encontrar, no algo prohibido.
+                child: Icon(Icons.card_giftcard, size: 40, color: Colors.grey),
               ),
             const SizedBox(height: 6),
             Text(
@@ -142,7 +148,7 @@ class _TicketCard extends StatelessWidget {
   }
 }
 
-class _TicketDetailDialog extends StatelessWidget {
+class _TicketDetailDialog extends StatefulWidget {
   final TicketDefinition def;
   final bool redeemed;
   final VoidCallback onRedeem;
@@ -153,74 +159,134 @@ class _TicketDetailDialog extends StatelessWidget {
   });
 
   @override
+  State<_TicketDetailDialog> createState() => _TicketDetailDialogState();
+}
+
+class _TicketDetailDialogState extends State<_TicketDetailDialog> {
+  late final ConfettiController _confetti;
+
+  @override
+  void initState() {
+    super.initState();
+    _confetti =
+        ConfettiController(duration: const Duration(milliseconds: 1200));
+    // Cada vez que abres un ticket que todavía no has canjeado, sorpresa con
+    // confeti
+    if (!widget.redeemed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _confetti.play());
+    }
+  }
+
+  @override
+  void dispose() {
+    _confetti.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final def = widget.def;
+    final redeemed = widget.redeemed;
+
     return Dialog(
-      backgroundColor: AppColors.bgDark2,
-      child: ConstrainedBox(
-        // Límite de alto para que nunca se desborde, sin importar el
-        // tamaño real de la imagen del ticket (arregla el warning de overflow).
-        constraints: BoxConstraints(
-          maxWidth: 340,
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(def.title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 260),
-                child: Image.asset(
-                  def.imageAsset,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 180,
-                    color: AppColors.bgDark,
-                    child: const Icon(Icons.card_giftcard,
-                        size: 64, color: AppColors.gold),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                def.prizeText,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13, height: 1.4),
-              ),
-              const SizedBox(height: 20),
-              if (redeemed)
-                Text('Ya canjeaste este ticket 💕',
-                    style: const TextStyle(fontSize: 12, color: Colors.white54))
-              else
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('CANCELAR'),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        onRedeem();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('CANJEAR (+200 XP)'),
-                    ),
-                  ],
-                ),
-              if (redeemed)
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('CERRAR'),
-                ),
-            ],
+      backgroundColor: Colors.transparent,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        clipBehavior: Clip.none,
+        children: [
+          ConfettiWidget(
+            confettiController: _confetti,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            numberOfParticles: 24,
+            colors: const [AppColors.pink, AppColors.gold, AppColors.cyan],
           ),
-        ),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.bgDark2,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            // Límite de alto para que nunca se desborde, sin importar el
+            // tamaño real de la imagen del ticket (arregla el warning de overflow).
+            constraints: BoxConstraints(
+              maxWidth: 340,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Título SIEMPRE centrado
+                  Text(
+                    def.title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 260),
+                    child: Image.asset(
+                      def.imageAsset,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Container(
+                        height: 180,
+                        color: AppColors.bgDark,
+                        child: const Icon(Icons.card_giftcard,
+                            size: 64, color: AppColors.gold),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    def.prizeText,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13, height: 1.4),
+                  ),
+                  const SizedBox(height: 20),
+                  if (redeemed)
+                    Column(
+                      children: [
+                        const Text('Ya canjeaste este ticket 💕',
+                            style:
+                                TextStyle(fontSize: 12, color: Colors.white54)),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('CERRAR'),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Column(
+                      // Canjear abajo, ancho completo
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              widget.onRedeem();
+                              Navigator.pop(context);
+                            },
+                            child: const Text('CANJEAR (+200 XP)'),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('CANCELAR'),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

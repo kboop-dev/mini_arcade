@@ -84,52 +84,17 @@ class _KeylaIanArcadeAppState extends State<KeylaIanArcadeApp> {
         scrollBehavior: NoScrollbarBehavior(),
         home: const AuthGate(),
         // El builder envuelve CUALQUIER pantalla (login, registro, home,
-        // cada minijuego) con lo mismo: un detector de toque que reintenta
-        // la música si el navegador la bloqueó, y el botoncito de mute
-        // flotante siempre visible arriba de todo.
+        // cada minijuego) con un detector de toque invisible que reintenta
+        // reproducir la música si el navegador bloqueó el autoplay — sin
+        // mostrar ningún botón ni ícono encima de las pantallas.
         builder: (context, child) {
           return GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => _music.resumeIfBlocked(),
-            child: Stack(
-              children: [
-                if (child != null) child,
-                const Positioned(
-                  top: 40,
-                  right: 12,
-                  child: SafeArea(child: _MuteButton()),
-                ),
-              ],
-            ),
+            child: child,
           );
         },
       ),
-    );
-  }
-}
-
-/// Botoncito flotante para silenciar/activar la música, visible en TODAS
-/// las pantallas (se inyecta desde el builder de MaterialApp de arriba).
-class _MuteButton extends StatelessWidget {
-  const _MuteButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<MusicService>(
-      builder: (context, music, _) {
-        return Material(
-          color: Colors.black45,
-          shape: const CircleBorder(),
-          child: IconButton(
-            iconSize: 20,
-            icon: Icon(
-              music.isMuted ? Icons.music_off : Icons.music_note,
-              color: Colors.white,
-            ),
-            onPressed: () => music.toggleMute(),
-          ),
-        );
-      },
     );
   }
 }

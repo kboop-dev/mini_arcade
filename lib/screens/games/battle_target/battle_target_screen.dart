@@ -7,8 +7,9 @@ import '../../../services/auth_service.dart';
 import '../../../services/firestore_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/narrator_overlay.dart';
+import '../../../widgets/fit_appbar_title.dart';
 
-/// Galería de tiro pixel art estilo battle royale.
+/// ZONA DE COMBATE — Galería de tiro pixel art estilo battle royale.
 /// Van apareciendo objetivos por toda la pantalla y hay que tocarlos antes
 /// de que desaparezcan. Algunos suman puntos/tiempo, otros restan vida.
 /// Encadenar aciertos sube un multiplicador de combo (x1 a x5) para que se
@@ -114,10 +115,10 @@ class _BattleTargetScreenState extends State<BattleTargetScreen> {
         context,
         gameKey: 'battle_target',
         lines: [
-          '¡Bienvenido a la Zona de Combate! 🎯 Van a aparecer objetivos por toda la pantalla, tienes que tocarlos rápido antes de que desaparezcan.',
-          'Los cascos 🪖 te dan puntos. Los drops de suministros 🎁 dan puntos dobles y tiempo extra. ¡Pero cuidado! Si tocas a un aliado 🙂 o una granada 💣 pierdes un corazón.',
+          '¡Bienvenido a la Zona de Combate! 🎯 Van a aparecer objetivos por toda la pantalla, tienes que tocarlos lo más rápido que puedas antes de que desaparezcan.',
+          'Los cascos 🪖 te dan puntos. Los regalos 🎁 dan puntos dobles y tiempo extra, ¡pero cuidado! Si tocas a un aliado 🙂 o una granada 💣 pierdes un corazón.',
           'Encadena aciertos seguidos para subir tu combo (hasta x5) y ganar más puntos por objetivo. Tienes ${kGameSeconds}s y $kMaxHearts corazones.',
-          'Si terminas la partida en dificultad DIFÍCIL con $kTicketScoreThreshold puntos o más, te llevas +450 XP y un ticket sorpresa 🎟️. En fácil y medio solo ganas XP de práctica, ¡el reto grande es para el nivel difícil! tú puedes TE AMOO',
+          'Si terminas la partida en dificultad DIFÍCIL con $kTicketScoreThreshold puntos o más, te llevas +450 XP y un ticket sorpresa 🎟️. En fácil y medio solo ganas XP de práctica, ¡yo sé que tu puedes, ánimoo',
         ],
       );
     });
@@ -286,7 +287,7 @@ class _BattleTargetScreenState extends State<BattleTargetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Zona de Combate 🎯')),
+      appBar: AppBar(title: FitAppBarTitle('Zona de Combate 🎯')),
       body: _difficulty == null
           ? _buildDifficultyPicker()
           : (_finished ? _buildResult() : _buildBattlefield()),
@@ -306,6 +307,26 @@ class _BattleTargetScreenState extends State<BattleTargetScreen> {
               'Elige tu nivel de combate',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 12),
+            // Explicación clara de cómo se gana, siempre visible antes de jugar
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.bgDark2,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.cyan.withOpacity(0.5)),
+              ),
+              child: const Text(
+                '🎯 Cómo ganar: sobrevive los 30 segundos sin quedarte sin '
+                'corazones (❤️❤️❤️). Toca cascos y drops para sumar puntos.\n\n'
+                '🎟️ El ticket sorpresa SOLO se gana en dificultad DIFÍCIL, '
+                'terminando la partida con $kTicketScoreThreshold puntos o más '
+                '(verás tu meta en pantalla mientras juegas).',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(fontSize: 12, height: 1.5, color: Colors.white70),
+              ),
             ),
             const SizedBox(height: 20),
             ...BtDifficulty.values.map(
@@ -373,48 +394,88 @@ class _BattleTargetScreenState extends State<BattleTargetScreen> {
   }
 
   Widget _buildHud() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: List.generate(
-              kMaxHearts,
-              (i) => Icon(
-                i < _hearts ? Icons.favorite : Icons.favorite_border,
-                color: AppColors.heartRed,
-                size: 20,
-              ),
-            ),
-          ),
-          Row(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.timer, color: AppColors.cyan, size: 18),
-              const SizedBox(width: 4),
-              Text('$_secondsLeft s', style: const TextStyle(fontSize: 16)),
+              Row(
+                children: List.generate(
+                  kMaxHearts,
+                  (i) => Icon(
+                    i < _hearts ? Icons.favorite : Icons.favorite_border,
+                    color: AppColors.heartRed,
+                    size: 20,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.timer, color: AppColors.cyan, size: 18),
+                  const SizedBox(width: 4),
+                  Text('$_secondsLeft s', style: const TextStyle(fontSize: 16)),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('$_score',
+                      style:
+                          const TextStyle(fontSize: 16, color: AppColors.gold)),
+                  if (_combo > 1) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.magenta,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text('x$_combo',
+                          style: const TextStyle(fontSize: 11)),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
-          Row(
-            children: [
-              Text('$_score',
-                  style: const TextStyle(fontSize: 16, color: AppColors.gold)),
-              if (_combo > 1) ...[
-                const SizedBox(width: 6),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.magenta,
-                    borderRadius: BorderRadius.circular(4),
+        ),
+        // Meta del ticket, SIEMPRE visible mientras juegas en difícil, para
+        // que sepas exactamente qué tan cerca estás de ganarlo.
+        if (_difficulty == BtDifficulty.dificil)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.confirmation_number,
+                        color: AppColors.gold, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Meta para el ticket: $_score / $kTicketScoreThreshold pts',
+                      style:
+                          const TextStyle(fontSize: 11, color: AppColors.gold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value:
+                        (_score / kTicketScoreThreshold).clamp(0, 1).toDouble(),
+                    minHeight: 6,
+                    backgroundColor: Colors.white24,
+                    color: AppColors.gold,
                   ),
-                  child: Text('x$_combo', style: const TextStyle(fontSize: 11)),
                 ),
               ],
-            ],
+            ),
           ),
-        ],
-      ),
+      ],
     );
   }
 

@@ -5,6 +5,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/firestore_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/narrator_overlay.dart';
+import '../../../widgets/fit_appbar_title.dart';
 
 enum Difficulty { facil, medio, dificil }
 
@@ -179,7 +180,7 @@ class _MinesweeperScreenState extends State<MinesweeperScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Buscaminas 💣💋')),
+      appBar: AppBar(title: FitAppBarTitle('Buscaminas 💣💋')),
       body: _difficulty == null ? _buildDifficultyPicker() : _buildBoard(),
     );
   }
@@ -257,17 +258,17 @@ class _MinesweeperScreenState extends State<MinesweeperScreen> {
         ),
         Padding(
           padding: const EdgeInsets.all(12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 8,
             children: [
-              if (_gameOver) ...[
+              if (_gameOver)
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(Icons.refresh, size: 18),
                   label: const Text('REINICIAR'),
                   onPressed: () => _start(_difficulty!),
                 ),
-                const SizedBox(width: 12),
-              ],
               OutlinedButton(
                 onPressed: () => setState(() => _difficulty = null),
                 child: const Text('CAMBIAR NIVEL'),

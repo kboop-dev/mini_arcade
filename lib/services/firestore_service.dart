@@ -80,6 +80,11 @@ class FirestoreService {
     return snap.data();
   }
 
+  /// Guarda la configuración del avatar (tono de piel, cabello, ojos, ropa)
+  Future<void> saveAvatar(String uid, Map<String, dynamic> avatarMap) {
+    return _userDoc(uid).update({'avatar': avatarMap});
+  }
+
   /// Desbloquea UN ticket del catálogo que pertenezca a [gameKey] y que el
   /// jugador todavía NO tenga, para que cada victoria dé un ticket distinto
   /// en vez de repetir siempre el mismo. Si ya tiene todos los de ese juego,

@@ -5,6 +5,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/firestore_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/narrator_overlay.dart';
+import '../../../widgets/fit_appbar_title.dart';
 
 final List<Map<String, String>> hangmanWords = [
   {'word': 'AMOR', 'clue': 'Lo que sentimos los dos <3'},
@@ -87,7 +88,7 @@ class _HangmanScreenState extends State<HangmanScreen> {
         lines: [
           '¡Bienvenido a "¿Qué tanto me conoces?"! Te voy a dar 5 acertijos, uno por uno y tienes que adivinar la palabra.',
           'Si fallas 6 veces en un acertijo, pierdes esa ronda y termina el juego.',
-          'Si ganas las 5 palabras cometiendo pocos errores en total, te ganas +400 XP y un ticket sorpresa 🎟️ (si te equivocas mucho, ganas las XP pero no el ticket). SUERTEE',
+          'Si ganas las 5 palabras cometiendo pocos errores en total, te ganas +400 XP y un ticket sorpresa 🎟️ (si te equivocas mucho, ganas las XP pero no el ticket). Échale ganas ehh, está muy facilísimo',
         ],
       );
     });
@@ -157,116 +158,116 @@ class _HangmanScreenState extends State<HangmanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text('¿Qué tanto me conoces? (${_currentRound + 1}/$kTotalRounds)'),
+        title: FitAppBarTitle(
+            '¿Qué tanto me conoces? (${_currentRound + 1}/$kTotalRounds)'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(
-              _clue,
-              style: Theme.of(context).textTheme.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 160,
-              child: CustomPaint(
-                size: const Size(160, 160),
-                painter: HangmanPainter(fails: _fails),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
-              children: _word.split('').map((c) {
-                if (c == ' ') {
-                  return const SizedBox(width: 20, height: 40);
-                }
-                final revealed = _guessed.contains(c) || _finished;
-                return Container(
-                  width: 32,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(color: AppColors.cyan, width: 2)),
-                  ),
-                  child: Text(
-                    revealed ? c : '',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 24),
-            if (_finished)
-              Column(
-                children: [
-                  Text(
-                    _wonGame
-                        ? (_totalFails <= kMaxTotalFailsForTicket
-                            ? '¡Felicidades, completaste las 5 palabras casi sin fallar! 🎉\n¡Ganaste un ticket sorpresa!'
-                            : '¡Completaste las 5 palabras! 🎉\nPeero te faltó un poco más de suerte para conseguir el ticket, pero ganaste tus XP igual.')
-                        : '¡Sé que la próxima podrás hacerlo mejor! ❤️\nLa palabra era: $_word',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, height: 1.4),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('VOLVER AL ARCADE'),
-                  ),
-                ],
-              )
-            else
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    // Calcula el tamaño de cada botón según el ancho disponible,
-                    // apuntando a ~7 columnas en celular y más en pantallas anchas,
-                    // para que nunca se vea apretado ni cortado.
-                    const spacing = 6.0;
-                    final targetColumns =
-                        (constraints.maxWidth / 52).floor().clamp(5, 10);
-                    final buttonSize = ((constraints.maxWidth -
-                                spacing * (targetColumns - 1)) /
-                            targetColumns)
-                        .clamp(32.0, 46.0);
+      body: LayoutBuilder(
+        builder: (context, outerConstraints) {
+          // Calcula el tamaño de cada botón según el ancho disponible,
+          // apuntando a ~7 columnas en celular y más en pantallas anchas,
+          // para que nunca se vea apretado ni cortado.
+          const spacing = 6.0;
+          const horizontalPadding = 20.0;
+          final availableWidth =
+              outerConstraints.maxWidth - horizontalPadding * 2;
+          final targetColumns = (availableWidth / 52).floor().clamp(5, 10);
+          final buttonSize =
+              ((availableWidth - spacing * (targetColumns - 1)) / targetColumns)
+                  .clamp(32.0, 46.0);
 
-                    return SingleChildScrollView(
-                      child: Wrap(
-                        spacing: spacing,
-                        runSpacing: spacing,
-                        alignment: WrapAlignment.center,
-                        children: _letters.split('').map((l) {
-                          final used = _guessed.contains(l);
-                          return SizedBox(
-                            width: buttonSize,
-                            height: buttonSize,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    used ? Colors.white24 : AppColors.pink,
-                                padding: EdgeInsets.zero,
-                              ),
-                              onPressed: used ? null : () => _guess(l),
-                              child:
-                                  Text(l, style: const TextStyle(fontSize: 12)),
-                            ),
-                          );
-                        }).toList(),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(horizontalPadding),
+            child: Column(
+              children: [
+                Text(
+                  _clue,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 160,
+                  child: CustomPaint(
+                    size: const Size(160, 160),
+                    painter: HangmanPainter(fails: _fails),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: _word.split('').map((c) {
+                    if (c == ' ') {
+                      return const SizedBox(width: 20, height: 40);
+                    }
+                    final revealed = _guessed.contains(c) || _finished;
+                    return Container(
+                      width: 32,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                            bottom:
+                                BorderSide(color: AppColors.cyan, width: 2)),
+                      ),
+                      child: Text(
+                        revealed ? c : '',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     );
-                  },
+                  }).toList(),
                 ),
-              ),
-          ],
-        ),
+                const SizedBox(height: 24),
+                if (_finished)
+                  Column(
+                    children: [
+                      Text(
+                        _wonGame
+                            ? (_totalFails <= kMaxTotalFailsForTicket
+                                ? '¡Felicidades, completaste las 5 palabras casi sin fallar! 🎉\n¡Ganaste un ticket sorpresa!'
+                                : '¡Completaste las 5 palabras! 🎉\nTe faltó un poco de actitud jaja pero ganaste tus XP igual.')
+                            : '¡Sé que la próxima podrás hacerlo mejor! ❤️\nLa palabra era: $_word',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16, height: 1.4),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('VOLVER AL ARCADE'),
+                      ),
+                    ],
+                  )
+                else
+                  Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    alignment: WrapAlignment.center,
+                    children: _letters.split('').map((l) {
+                      final used = _guessed.contains(l);
+                      return SizedBox(
+                        width: buttonSize,
+                        height: buttonSize,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                used ? Colors.white24 : AppColors.pink,
+                            padding: EdgeInsets.zero,
+                          ),
+                          onPressed: used ? null : () => _guess(l),
+                          child: Text(l, style: const TextStyle(fontSize: 12)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                // Deja aire al final para que el último renglón del teclado
+                // nunca quede pegado al borde de la pantalla.
+                const SizedBox(height: 24),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

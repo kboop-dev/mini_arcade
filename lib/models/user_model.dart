@@ -1,11 +1,14 @@
+import 'avatar_config.dart';
+
 class AppUser {
   final String uid;
   final String username;
   final String email;
   final int xp;
   final DateTime createdAt;
+  final AvatarConfig avatar;
 
-  // IDs de rompecabezas completados en modo supervivencia (1-10)
+  // IDs de rompecabezas oficiales completados en modo supervivencia (1-10)
   final List<String> puzzlesCompletedSurvival;
 
   // IDs de tickets ya desbloqueados y canjeados
@@ -17,6 +20,7 @@ class AppUser {
     required this.email,
     this.xp = 0,
     required this.createdAt,
+    this.avatar = const AvatarConfig(),
     this.puzzlesCompletedSurvival = const [],
     this.ticketsUnlocked = const {},
   });
@@ -28,6 +32,9 @@ class AppUser {
       email: map['email'] ?? '',
       xp: (map['xp'] ?? 0) as int,
       createdAt: DateTime.tryParse(map['createdAt'] ?? '') ?? DateTime.now(),
+      avatar: AvatarConfig.fromMap(map['avatar'] != null
+          ? Map<String, dynamic>.from(map['avatar'])
+          : null),
       puzzlesCompletedSurvival:
           List<String>.from(map['puzzlesCompletedSurvival'] ?? []),
       ticketsUnlocked: Map<String, bool>.from(map['ticketsUnlocked'] ?? {}),
@@ -40,6 +47,7 @@ class AppUser {
       'email': email,
       'xp': xp,
       'createdAt': createdAt.toIso8601String(),
+      'avatar': avatar.toMap(),
       'puzzlesCompletedSurvival': puzzlesCompletedSurvival,
       'ticketsUnlocked': ticketsUnlocked,
     };

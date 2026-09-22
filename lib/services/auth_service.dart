@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/avatar_config.dart';
 
 /// Maneja registro, login y sesión del jugador.
 /// La seguridad real de las contraseñas la maneja Firebase Auth
@@ -27,6 +28,7 @@ class AuthService {
       'email': email.trim(),
       'xp': 0,
       'createdAt': DateTime.now().toIso8601String(),
+      'avatar': const AvatarConfig().toMap(),
       'puzzlesCompletedSurvival': <String>[],
       'ticketsUnlocked': <String, bool>{},
     });

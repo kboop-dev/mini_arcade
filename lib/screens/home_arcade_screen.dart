@@ -11,6 +11,8 @@ import 'games/minesweeper/minesweeper_screen.dart';
 import 'games/hangman/hangman_screen.dart';
 import 'games/battle_target/battle_target_screen.dart';
 import 'tickets/tickets_gallery_screen.dart';
+import 'profile/profile_screen.dart';
+import '../widgets/avatar_view.dart';
 
 class GameEntry {
   final String title;
@@ -90,16 +92,7 @@ class HomeArcadeScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: TextButton(
-                            onPressed: () => auth.logout(),
-                            child: const Text('Cerrar sesión',
-                                style: TextStyle(color: AppColors.textLight)),
-                          ),
-                        ),
-                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
                     ],
                   );
                 },
@@ -126,39 +119,58 @@ class _Header extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.bgDark2,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.pink, width: 2),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('¡Hola, ${user?.username ?? '...'}!',
-                style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 8),
-            Text(rank.label,
-                style: const TextStyle(color: AppColors.gold, fontSize: 14)),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress.clamp(0, 1),
-                minHeight: 10,
-                backgroundColor: Colors.white24,
-                color: AppColors.cyan,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => Navigator.push(
+            context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.bgDark2,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.pink, width: 2),
+          ),
+          child: Row(
+            children: [
+              if (user != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: AvatarView(config: user!.avatar, size: 56),
+                ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('¡Hola, ${user?.username ?? '...'}!',
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    const SizedBox(height: 8),
+                    Text(rank.label,
+                        style: const TextStyle(
+                            color: AppColors.gold, fontSize: 14)),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: progress.clamp(0, 1),
+                        minHeight: 10,
+                        backgroundColor: Colors.white24,
+                        color: AppColors.cyan,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      next == null
+                          ? '¡Rango máximo alcanzado! ($xp XP)'
+                          : '$xp / ${next.minXp} XP para ${next.label}',
+                      style:
+                          const TextStyle(fontSize: 11, color: Colors.white70),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              next == null
-                  ? '¡Rango máximo alcanzado! ($xp XP)'
-                  : '$xp / ${next.minXp} XP para ${next.label}',
-              style: const TextStyle(fontSize: 11, color: Colors.white70),
-            ),
-          ],
+              const Icon(Icons.chevron_right, color: Colors.white38),
+            ],
+          ),
         ),
       ),
     );

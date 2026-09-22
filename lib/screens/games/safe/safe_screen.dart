@@ -4,10 +4,12 @@ import '../../../services/auth_service.dart';
 import '../../../services/firestore_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/narrator_overlay.dart';
+import '../../../widgets/fit_appbar_title.dart';
 
 const String kAnniversaryDate = '22/09/2023';
 
-const String kAnniversaryLetter = 'Carta de aniversario';
+const String kAnniversaryLetter =
+    'Aquí va la carta de su aniversario. Reemplaza este texto por el mensaje real 💌';
 
 class SafeScreen extends StatefulWidget {
   const SafeScreen({super.key});
@@ -31,7 +33,7 @@ class _SafeScreenState extends State<SafeScreen> {
         gameKey: 'safe',
         lines: [
           'Esta cajita guarda un secreto 🔒. Tienes que adivinar una fecha muy especial para nosotros y escribirla.',
-          'Si aciertas, se abre y te lleva +300 XP. Este juego no tiene ticket escondido, ¡es un extra especial solo para ti! Espero que te guste.',
+          'Si aciertas, se abre y te lleva +300 XP. Este juego no tiene ticket escondido, ¡es un extra especial solo para ti!',
         ],
       );
     });
@@ -49,15 +51,15 @@ class _SafeScreenState extends State<SafeScreen> {
       final db = context.read<FirestoreService>();
       await db.addXp(auth.currentUser!.uid, 300);
     } else {
-      setState(() =>
-          _error = '¿Cómo crees? Esa no es la fecha:(... ¡inténtalo de nuevo!');
+      setState(() => _error =
+          '¿Cómo vas a creer? esa no eess... ¡tienes otra oportunidad!');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Caja fuerte')),
+      appBar: AppBar(title: FitAppBarTitle('Caja fuerte')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -163,7 +165,7 @@ class _SafeScreenState extends State<SafeScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text('— Keyla 💕',
+                  const Text(' Keyla 💕',
                       style: TextStyle(color: Color(0xFF3D2B1F), fontSize: 11)),
                 ],
               ),

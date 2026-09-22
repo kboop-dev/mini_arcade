@@ -2,22 +2,15 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../theme/app_theme.dart';
+import '../../../widgets/fit_appbar_title.dart';
 import 'puzzle_game_screen.dart';
 
 enum PuzzleMode { cronometro, creativo }
 
-final List<String> officialPuzzlePhotos = [
-  'assets/images/puzzles/foto1.jpeg',
-  'assets/images/puzzles/foto2.jpeg',
-  'assets/images/puzzles/foto3.jpeg',
-  'assets/images/puzzles/foto4.jpeg',
-  'assets/images/puzzles/foto5.jpeg',
-  'assets/images/puzzles/foto6.jpeg',
-  'assets/images/puzzles/foto7.jpeg',
-  'assets/images/puzzles/foto8.jpeg',
-  'assets/images/puzzles/foto9.jpeg',
-  'assets/images/puzzles/foto10.jpeg',
-];
+final List<String> officialPuzzlePhotos = List.generate(
+  10,
+  (i) => 'assets/images/puzzles/foto${i + 1}.jpg',
+);
 
 class PuzzleGalleryScreen extends StatelessWidget {
   const PuzzleGalleryScreen({super.key});
@@ -25,7 +18,7 @@ class PuzzleGalleryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Rompecabezas')),
+      appBar: AppBar(title: FitAppBarTitle('Rompecabezas')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -65,7 +58,7 @@ class PuzzleGalleryScreen extends StatelessWidget {
     final file = await picker.pickImage(source: ImageSource.gallery);
     if (file == null || !context.mounted) return;
 
-    // IMPORTANTE: se leen los BYTES de la imagen (funciona en web, celular
+    // Se leen los BYTES de la imagen (funciona en web, celular
     // y escritorio) en vez de usar la ruta del archivo, que en Flutter Web
     // no se puede abrir con dart:io y era la causa de que "no jalara".
     final bytes = await file.readAsBytes();
