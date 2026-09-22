@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+
       - name: Get SHA1 fingerprint
         run: cd android && ./gradlew signingReport
         continue-on-error: true
