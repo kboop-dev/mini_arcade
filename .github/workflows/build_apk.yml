@@ -22,24 +22,21 @@ jobs:
           channel: 'stable'
           
       - name: Install dependencies
-        working-directory: mini_arcade
         run: flutter pub get
 
       - name: Make Gradle executable
-        working-directory: mini_arcade/android
-        run: chmod +x gradlew
+        run: chmod +x android/gradlew
+        continue-on-error: true
 
       - name: Get SHA1 fingerprint
-        working-directory: mini_arcade/android
-        run: ./gradlew signingReport
+        run: cd android && ./gradlew signingReport
         continue-on-error: true
 
       - name: Build APK
-        working-directory: mini_arcade
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: mini_arcade/build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
