@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/avatar_config.dart';
 
-/// Dibuja el avatar del jugador estilo "chibi" (cabeza grande, cuerpo chico,
-/// look tierno) combinando tono de piel, cabello, ojos y ropa según [config].
+/// Dibuja el avatar del jugador estilo "chibi" refinado con cabello
+/// en capas integradas (capa trasera + cara + fleco/volumen frontal).
 class AvatarView extends StatelessWidget {
   final AvatarConfig config;
   final double size;
@@ -37,98 +37,80 @@ class _AvatarPainter extends CustomPainter {
     final outfitBase = Paint()..color = config.outfitColor;
     final outfitLight = Paint()..color = _lighten(config.outfitColor, 0.28);
     const outline = Colors.black87;
-    final hairOutline = Paint()
+    final strokeLine = Paint()
       ..color = outline
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
+      ..strokeWidth = 2.2
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    final headCenter = Offset(w * 0.5, h * 0.44);
-    final headRadius = w * 0.30;
+    final headCenter = Offset(w * 0.5, h * 0.45);
+    final headRadius = w * 0.31;
 
-    // --- Halo suave detrás del avatar ---
+    // --- 1. Halo brillante suave de fondo ---
     canvas.drawCircle(headCenter, w * 0.46,
         Paint()..color = config.outfitColor.withOpacity(0.18));
 
-    // --- Cuerpo / hombros (proporción chibi: cuerpo chico) ---
+    // --- 2. Cuerpo / Hombros ---
     final bodyPath = Path()
-      ..moveTo(w * 0.30, h * 1.0)
-      ..lineTo(w * 0.24, h * 0.80)
-      ..quadraticBezierTo(w * 0.5, h * 0.70, w * 0.76, h * 0.80)
-      ..lineTo(w * 0.70, h * 1.0)
+      ..moveTo(w * 0.28, h * 1.0)
+      ..lineTo(w * 0.22, h * 0.80)
+      ..quadraticBezierTo(w * 0.5, h * 0.68, w * 0.78, h * 0.80)
+      ..lineTo(w * 0.72, h * 1.0)
       ..close();
     canvas.drawPath(bodyPath, outfitBase);
-    canvas.drawPath(
-        bodyPath,
-        Paint()
-          ..color = outline
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2);
+    canvas.drawPath(bodyPath, strokeLine);
     canvas.drawArc(
-      Rect.fromLTWH(w * 0.36, h * 0.74, w * 0.28, h * 0.14),
+      Rect.fromLTWH(w * 0.35, h * 0.74, w * 0.30, h * 0.14),
       0,
       pi,
       false,
       outfitLight,
     );
 
-    // CABELLO
-    // Piezas que van "detrás" de la cabeza (mechones largos, coleta trasera)
+    // --- 3. CABELLO: Capas traseras y volumen superior ---
     if (config.hairStyle == HairStyle.largo) {
       final sideL = Path()
-        ..moveTo(w * 0.17, h * 0.30)
-        ..quadraticBezierTo(w * 0.08, h * 0.60, w * 0.19, h * 0.88)
-        ..lineTo(w * 0.29, h * 0.84)
-        ..quadraticBezierTo(w * 0.20, h * 0.56, w * 0.27, h * 0.30)
+        ..moveTo(w * 0.18, h * 0.28)
+        ..quadraticBezierTo(w * 0.08, h * 0.60, w * 0.20, h * 0.90)
+        ..lineTo(w * 0.32, h * 0.86)
+        ..quadraticBezierTo(w * 0.22, h * 0.56, w * 0.28, h * 0.30)
         ..close();
       final sideR = Path()
-        ..moveTo(w * 0.83, h * 0.30)
-        ..quadraticBezierTo(w * 0.92, h * 0.60, w * 0.81, h * 0.88)
-        ..lineTo(w * 0.71, h * 0.84)
-        ..quadraticBezierTo(w * 0.80, h * 0.56, w * 0.73, h * 0.30)
+        ..moveTo(w * 0.82, h * 0.28)
+        ..quadraticBezierTo(w * 0.92, h * 0.60, w * 0.80, h * 0.90)
+        ..lineTo(w * 0.68, h * 0.86)
+        ..quadraticBezierTo(w * 0.78, h * 0.56, w * 0.72, h * 0.30)
         ..close();
       canvas.drawPath(sideL, hairBase);
-      canvas.drawPath(sideL, hairOutline);
+      canvas.drawPath(sideL, strokeLine);
       canvas.drawPath(sideR, hairBase);
-      canvas.drawPath(sideR, hairOutline);
+      canvas.drawPath(sideR, strokeLine);
     } else if (config.hairStyle == HairStyle.coleta) {
       final tail = Path()
-        ..moveTo(w * 0.76, h * 0.26)
-        ..quadraticBezierTo(w * 0.98, h * 0.30, w * 0.90, h * 0.60)
-        ..quadraticBezierTo(w * 0.83, h * 0.66, w * 0.76, h * 0.50)
+        ..moveTo(w * 0.72, h * 0.22)
+        ..quadraticBezierTo(w * 0.98, h * 0.25, w * 0.92, h * 0.58)
+        ..quadraticBezierTo(w * 0.82, h * 0.62, w * 0.72, h * 0.45)
         ..close();
       canvas.drawPath(tail, hairBase);
-      canvas.drawPath(tail, hairOutline);
+      canvas.drawPath(tail, strokeLine);
     }
 
-    // Gorro/fleco base — un óvalo simple; lo que sobresalga por encima de la
-    // cabeza es justo lo que se ve como cabello, todo lo demás queda tapado.
-    final capRect = Rect.fromCenter(
-        center: Offset(w * 0.5, h * 0.24), width: w * 0.70, height: h * 0.46);
-    if (config.hairStyle == HairStyle.chino) {
-      // Varios bultos redondos (look rizado) en vez de un óvalo liso
-      for (final dx in [0.22, 0.37, 0.52, 0.67]) {
-        final r = Rect.fromLTWH(w * dx, h * 0.06, w * 0.20, h * 0.24);
-        canvas.drawOval(r, hairBase);
-        canvas.drawOval(r, hairOutline);
-      }
-    } else {
-      canvas.drawOval(capRect, hairBase);
-      canvas.drawOval(capRect, hairOutline);
-    }
+    // Domo principal de cabello sobre la cabeza (da la forma superior)
+    final hairTopPath = Path()
+      ..addArc(
+        Rect.fromCircle(
+            center: Offset(w * 0.5, h * 0.38), radius: headRadius * 1.15),
+        pi * 0.9,
+        pi * 1.2,
+      );
+    canvas.drawPath(hairTopPath, hairBase);
 
-    // --- CABEZA (tapa la parte de abajo del cabello, dejando la gorra prolija) ---
+    // --- 4. CARA / CABEZA ---
     canvas.drawCircle(headCenter, headRadius, skin);
-    canvas.drawCircle(
-        headCenter,
-        headRadius,
-        Paint()
-          ..color = outline
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2);
+    canvas.drawCircle(headCenter, headRadius, strokeLine);
 
-    // Sombra sutil bajo el mentón para dar volumen
+    // Sombra sutil bajo el mentón
     canvas.drawArc(
       Rect.fromCircle(center: headCenter, radius: headRadius * 0.95),
       0.3,
@@ -137,68 +119,135 @@ class _AvatarPainter extends CustomPainter {
       Paint()
         ..color = skinShadowColor
         ..style = PaintingStyle.stroke
-        ..strokeWidth = headRadius * 0.15,
+        ..strokeWidth = headRadius * 0.12,
     );
 
-    // --- Mejillas (blush) ---
-    final blush = Paint()..color = const Color(0xFFFF8FA3).withOpacity(0.45);
+    // --- 5. CABELLO: Flecos y capas frontales (¡Cubre la frente!) ---
+    final frontHairPath = Path();
+
+    switch (config.hairStyle) {
+      case HairStyle.corto:
+        frontHairPath
+          ..moveTo(w * 0.18, h * 0.40)
+          ..quadraticBezierTo(w * 0.22, h * 0.18, w * 0.50, h * 0.16)
+          ..quadraticBezierTo(w * 0.78, h * 0.18, w * 0.82, h * 0.40)
+          ..quadraticBezierTo(w * 0.68, h * 0.30, w * 0.50, h * 0.34)
+          ..quadraticBezierTo(w * 0.32, h * 0.30, w * 0.18, h * 0.40)
+          ..close();
+        break;
+
+      case HairStyle.largo:
+        frontHairPath
+          ..moveTo(w * 0.18, h * 0.42)
+          ..quadraticBezierTo(w * 0.25, h * 0.18, w * 0.50, h * 0.16)
+          ..quadraticBezierTo(w * 0.75, h * 0.18, w * 0.82, h * 0.42)
+          ..quadraticBezierTo(w * 0.65, h * 0.32, w * 0.50, h * 0.36)
+          ..quadraticBezierTo(w * 0.35, h * 0.32, w * 0.18, h * 0.42)
+          ..close();
+        break;
+
+      case HairStyle.chino:
+        // Rizos adorables que caen en la frente
+        for (final offset in [
+          Offset(w * 0.26, h * 0.22),
+          Offset(w * 0.40, h * 0.19),
+          Offset(w * 0.60, h * 0.19),
+          Offset(w * 0.74, h * 0.22),
+          Offset(w * 0.33, h * 0.27),
+          Offset(w * 0.50, h * 0.28),
+          Offset(w * 0.67, h * 0.27),
+        ]) {
+          canvas.drawCircle(offset, w * 0.11, hairBase);
+          canvas.drawCircle(offset, w * 0.11, strokeLine);
+        }
+        break;
+
+      case HairStyle.coleta:
+        frontHairPath
+          ..moveTo(w * 0.18, h * 0.40)
+          ..quadraticBezierTo(w * 0.25, h * 0.18, w * 0.50, h * 0.16)
+          ..quadraticBezierTo(w * 0.75, h * 0.18, w * 0.82, h * 0.40)
+          ..quadraticBezierTo(w * 0.60, h * 0.32, w * 0.50, h * 0.35)
+          ..quadraticBezierTo(w * 0.40, h * 0.32, w * 0.18, h * 0.40)
+          ..close();
+        break;
+    }
+
+    if (config.hairStyle != HairStyle.chino) {
+      canvas.drawPath(frontHairPath, hairBase);
+      canvas.drawPath(frontHairPath, strokeLine);
+    }
+
+    // Brillo/Highlight en el cabello frontal
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(w * 0.5, h * 0.20),
+        width: w * 0.24,
+        height: h * 0.05,
+      ),
+      hairHighlight,
+    );
+
+    // --- 6. MEJILLAS (Blush tierno) ---
+    final blush = Paint()..color = const Color(0xFFFF8FA3).withOpacity(0.50);
     canvas.drawOval(
         Rect.fromCenter(
-            center: Offset(w * 0.34, h * 0.48),
-            width: w * 0.10,
+            center: Offset(w * 0.32, h * 0.50),
+            width: w * 0.11,
             height: h * 0.06),
         blush);
     canvas.drawOval(
         Rect.fromCenter(
-            center: Offset(w * 0.66, h * 0.48),
-            width: w * 0.10,
+            center: Offset(w * 0.68, h * 0.50),
+            width: w * 0.11,
             height: h * 0.06),
         blush);
 
-    // --- Ojos grandes y redondos, con brillo ---
-    final eyeW = w * 0.09;
-    final eyeH = h * 0.11;
-    final leftEyeCenter = Offset(w * 0.38, h * 0.44);
-    final rightEyeCenter = Offset(w * 0.62, h * 0.44);
-    final eyeOutline = Paint()
-      ..color = outline
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4;
+    // --- 7. OJOS GRANDES CHIBI ---
+    final eyeW = w * 0.10;
+    final eyeH = h * 0.12;
+    final leftEyeCenter = Offset(w * 0.37, h * 0.46);
+    final rightEyeCenter = Offset(w * 0.63, h * 0.46);
+
     for (final c in [leftEyeCenter, rightEyeCenter]) {
       final r = Rect.fromCenter(center: c, width: eyeW, height: eyeH);
       canvas.drawOval(r, eyeColor);
-      canvas.drawOval(r, eyeOutline);
+      canvas.drawOval(r, strokeLine);
+      // Pestaña/Línea superior del ojo
+      final lash = Path()
+        ..moveTo(c.dx - eyeW * 0.55, c.dy - eyeH * 0.2)
+        ..quadraticBezierTo(
+            c.dx, c.dy - eyeH * 0.7, c.dx + eyeW * 0.55, c.dy - eyeH * 0.2);
+      canvas.drawPath(lash, strokeLine);
+
+      // Brillos de los ojos
       canvas.drawCircle(
         Offset(c.dx - eyeW * 0.18, c.dy - eyeH * 0.22),
-        eyeW * 0.16,
+        eyeW * 0.18,
+        Paint()..color = Colors.white,
+      );
+      canvas.drawCircle(
+        Offset(c.dx + eyeW * 0.18, c.dy + eyeH * 0.20),
+        eyeW * 0.09,
         Paint()..color = Colors.white,
       );
     }
 
-    // --- Nariz (puntito sutil) ---
+    // --- 8. NARIZ Y SONRISA ---
     canvas.drawCircle(
-        Offset(w * 0.5, h * 0.49), w * 0.012, Paint()..color = skinShadowColor);
+        Offset(w * 0.5, h * 0.52), w * 0.012, Paint()..color = skinShadowColor);
 
-    // --- Sonrisa curva ---
     final smile = Path()
-      ..moveTo(w * 0.43, h * 0.54)
-      ..quadraticBezierTo(w * 0.5, h * 0.59, w * 0.57, h * 0.54);
+      ..moveTo(w * 0.43, h * 0.56)
+      ..quadraticBezierTo(w * 0.5, h * 0.61, w * 0.57, h * 0.56);
     canvas.drawPath(
       smile,
       Paint()
         ..color = outline
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
+        ..strokeWidth = 2.2
         ..strokeCap = StrokeCap.round,
     );
-
-    // --- Brillo de cabello (encima de la cabeza, dentro de la parte visible) ---
-    final highlightRect = Rect.fromCenter(
-      center: Offset(w * 0.5, h * 0.14),
-      width: w * (config.hairStyle == HairStyle.chino ? 0.20 : 0.26),
-      height: h * 0.08,
-    );
-    canvas.drawOval(highlightRect, hairHighlight);
   }
 
   Color _lighten(Color c, double amount) {

@@ -96,8 +96,8 @@ class _TicketCard extends StatelessWidget {
                 opacity: redeemed ? 0.6 : 1,
                 child: Image.asset(
                   found
-                      ? 'assets/images/tickets/gift_unlocked.png'
-                      : 'assets/images/tickets/gift_locked.png',
+                      ? 'assets/images/tickets/gift_locked.png'
+                      : 'assets/images/tickets/gift_unlocked.png',
                   fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => Icon(
                     Icons.card_giftcard,
