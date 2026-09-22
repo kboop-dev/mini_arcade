@@ -129,72 +129,82 @@ class _SafeScreenState extends State<SafeScreen> {
   }
 
   Widget _buildLetter() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Sello de cera (decorativo) sobre la carta
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.heartRed,
-            boxShadow: [
-              BoxShadow(
-                  color: AppColors.heartRed.withOpacity(0.5),
-                  blurRadius: 10,
-                  spreadRadius: 1),
-            ],
-          ),
-          child: const Icon(Icons.favorite, color: Colors.white, size: 26),
-        ),
-        Transform.translate(
-          offset: const Offset(0, -12),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 380),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Sello de cera (decorativo) sobre la carta
+            Container(
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                // Look de hoja de papel/carta antigua, no de caja de juego
-                color: const Color(0xFFFBF3E1),
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: const [
+                shape: BoxShape.circle,
+                color: AppColors.heartRed,
+                boxShadow: [
                   BoxShadow(
-                      color: Colors.black45,
-                      blurRadius: 16,
-                      offset: Offset(0, 8)),
+                      color: AppColors.heartRed.withOpacity(0.5),
+                      blurRadius: 10,
+                      spreadRadius: 1),
                 ],
-                border: Border.all(color: const Color(0xFFD9C79A), width: 6),
               ),
-              child: Column(
-                children: [
-                  const Text('✦ ✦ ✦',
-                      style: TextStyle(color: Color(0xFFB8955C), fontSize: 12)),
-                  const SizedBox(height: 12),
-                  Text(
-                    kAnniversaryLetter,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: 'PixelFont',
-                      color: Color(0xFF3D2B1F),
-                      fontSize: 11,
-                      height: 1.9,
-                    ),
+              child: const Icon(Icons.favorite, color: Colors.white, size: 26),
+            ),
+            Transform.translate(
+              offset: const Offset(0, -12),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 380),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                  decoration: BoxDecoration(
+                    // Look de hoja de papel/carta antigua
+                    color: const Color(0xFFFBF3E1),
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Colors.black45,
+                          blurRadius: 16,
+                          offset: Offset(0, 8)),
+                    ],
+                    border:
+                        Border.all(color: const Color(0xFFD9C79A), width: 6),
                   ),
-                  const SizedBox(height: 12),
-                  const Text(' Keyla 💕',
-                      style: TextStyle(color: Color(0xFF3D2B1F), fontSize: 11)),
-                ],
+                  child: Column(
+                    children: [
+                      const Text('✦ ✦ ✦',
+                          style: TextStyle(
+                              color: Color(0xFFB8955C), fontSize: 12)),
+                      const SizedBox(height: 12),
+                      Text(
+                        kAnniversaryLetter.trim(),
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        style: const TextStyle(
+                          fontFamily: 'PixelFont',
+                          color: Color(0xFF3D2B1F),
+                          fontSize: 11,
+                          height: 1.8,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(' Keyla 💕',
+                          style: TextStyle(
+                              color: Color(0xFF3D2B1F), fontSize: 11)),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('VOLVER AL ARCADE'),
+            ),
+          ],
         ),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('VOLVER AL ARCADE'),
-        ),
-      ],
+      ),
     );
   }
 }
