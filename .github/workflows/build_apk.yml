@@ -24,13 +24,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Make Gradle executable
-        run: chmod +x android/gradlew
-        continue-on-error: true
-
-      - name: Get SHA1 fingerprint
-        run: cd android && ./gradlew signingReport
-        continue-on-error: true
+      - name: Print Keystore SHA1
+        run: keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
 
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
